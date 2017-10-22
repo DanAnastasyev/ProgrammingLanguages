@@ -1,18 +1,20 @@
 /*
- * Модуль, предоставляющий ООП API к библиотеке
+ * Модуль, предоставляющий функциональное API к библиотеке
  */
 
-#include "PyWidgetsClasses.h"
+#include "PyWidgetsFunctions.h"
+
+extern PyMethodDef methods[];
 
 //--------------------------------------------------------------------------
 
-PyMODINIT_FUNC PyInit_pywidgets() {
+PyMODINIT_FUNC PyInit__pywidgets() {
     static PyModuleDef modDef = {
         PyModuleDef_HEAD_INIT,
-        "pywidgets",
+        "_pywidgets",
         "Qt-widgets module",
         -1,
-        NULL,
+        methods
     };
 
     PyObject* module = PyModule_Create(&modDef);

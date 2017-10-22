@@ -1,9 +1,9 @@
-#ifndef PY_WIDGETS_MACROSES_H
-#define PY_WIDGETS_MACROSES_H
-
 /*
  * Макросы, используемые для генерации кода классов-оберток
  */
+
+#ifndef PY_WIDGETS_MACROSES_H
+#define PY_WIDGETS_MACROSES_H
 
 #define PY_CLASS_WRAPPER(ClassName, methods, new_method) \
 struct Py##ClassName { \

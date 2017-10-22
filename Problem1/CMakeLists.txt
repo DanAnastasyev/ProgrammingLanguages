@@ -18,14 +18,26 @@ add_executable(
     )
 
 python_add_module(
+    _pywidgets
+    PyWidgetsFunctionsModule.cpp Widgets.h Widgets.cpp PyWidgetsClasses.h
+    PyWidgetsMacroses.h PyWidgetsFunctions.h
+    )
+
+python_add_module(
     pywidgets
     PyWidgetsModule.cpp Widgets.h Widgets.cpp PyWidgetsClasses.h
-    PyWidgetsMacroses.h PyWidgetsFunctions.h
+    PyWidgetsMacroses.h
     )
 
 add_definitions(-DQT_NO_KEYWORDS)
 
 target_link_libraries(widgets
+    ${Qt5Core_LIBRARIES}
+    ${Qt5Widgets_LIBRARIES}
+    ${PYTHON_LIBRARIES}
+    )
+
+target_link_libraries(_pywidgets
     ${Qt5Core_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}
     ${PYTHON_LIBRARIES}

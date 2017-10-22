@@ -1,3 +1,7 @@
+/*
+ * Набор классов-оберток над сущностями из библиотеки
+ */
+
 #ifndef PY_WIDGETS_CLASSES_H
 #define PY_WIDGETS_CLASSES_H
 

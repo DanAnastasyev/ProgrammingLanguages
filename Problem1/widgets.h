@@ -1,3 +1,7 @@
+/*
+ * С++ библиотека-обертка над QT
+ */
+
 #ifndef WIDGETS_H
 #define WIDGETS_H
 
