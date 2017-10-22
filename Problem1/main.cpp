@@ -21,7 +21,7 @@ void handle_button_click(struct Object *sender)
 
 int main(int argc, char *argv[])
 {
-    struct Application *app = Application_New(argc, argv);
+    struct Application *app = Application_New();
     const char *app_class_name = Object_GetClassName((struct Object*) app);
     assert(0 == strcmp(app_class_name, "Application"));
 

@@ -1,4 +1,4 @@
-project(qt-cmake-project)
+project(problem-1)
 cmake_minimum_required(VERSION 3.0)
 find_package(Qt5 COMPONENTS Core Widgets)
 
@@ -12,23 +12,26 @@ include_directories(${PYTHON_INCLUDE_DIRS})
 
 message(${PYTHON_INCLUDE_DIRS})
 
-set(SOURCES
-    main.cpp
+add_executable(
+    widgets
+    Main.cpp Widgets.h Widgets.cpp
     )
 
-set(HEADERS widgets.h)
-
-qt5_wrap_ui(UI_SRC ${FORMS})
-qt5_wrap_cpp(MOC_SRC ${HEADERS})
-
-add_executable(
-    window_app
-    ${SOURCES} ${UI_SRC} ${MOC_SRC}
+python_add_module(
+    pywidgets
+    PyWidgetsModule.cpp Widgets.h Widgets.cpp PyWidgetsClasses.h
+    PyWidgetsMacroses.h PyWidgetsFunctions.h
     )
 
 add_definitions(-DQT_NO_KEYWORDS)
 
-target_link_libraries(window_app
+target_link_libraries(widgets
+    ${Qt5Core_LIBRARIES}
+    ${Qt5Widgets_LIBRARIES}
+    ${PYTHON_LIBRARIES}
+    )
+
+target_link_libraries(pywidgets
     ${Qt5Core_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}
     ${PYTHON_LIBRARIES}
