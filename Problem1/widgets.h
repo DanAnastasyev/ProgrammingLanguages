@@ -48,7 +48,7 @@ inline int Application_Exec(Application* app) {
 //----------------------------------------------------------------------------------------
 
 struct Widget : public virtual QWidget, public virtual Object {
-    Widget(Widget* parent) : QWidget(parent), Object("Widget") {}
+    Widget(Widget* parent);
 };
 
 inline Widget* Widget_New(Widget* parent) {
@@ -83,7 +83,7 @@ inline void Widget_SetLayout(Widget* widget, Layout* layout) {
 //----------------------------------------------------------------------------------------
 
 struct VBoxLayout : public virtual QVBoxLayout, public virtual Object {
-    VBoxLayout(Widget* parent) : QVBoxLayout(parent), Object("VBoxLayout") {}
+    VBoxLayout(Widget* parent);
 };
 
 inline struct VBoxLayout* VBoxLayout_New(Widget* parent) {
@@ -107,7 +107,7 @@ inline void Label_SetText(Label* label, const char* text) {
 //----------------------------------------------------------------------------------------
 
 struct PushButton : public virtual QPushButton, public virtual Object {
-    PushButton(Widget* parent) : QPushButton(parent), Object("PushButton") {}
+    PushButton(Widget* parent);
 };
 
 inline PushButton* PushButton_New(Widget* widget) {
