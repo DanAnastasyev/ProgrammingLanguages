@@ -125,6 +125,7 @@ static PyObject* PyVBoxLayout_new(PyTypeObject* type, PyObject* args, PyObject* 
     if (!PyArg_ParseTuple(args, "O", &parent)) {
         return NULL;
     }
+    Py_INCREF(parent);
     if (self != NULL) {
         self->pImpl = VBoxLayout_New(parent->pImpl);
     }
@@ -143,6 +144,7 @@ static PyObject* PyWidget_SetLayout(PyWidget* self, PyObject* args) {
     if (!PyArg_ParseTuple(args, "O", &layout)) {
         return NULL;
     }
+    Py_INCREF(layout);
     Widget_SetLayout(self->pImpl, (Layout*) layout->pImpl);
     Py_RETURN_NONE;
 }
@@ -170,6 +172,7 @@ static PyObject* PyLabel_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
     if (!PyArg_ParseTuple(args, "O", &parent)) {
         return NULL;
     }
+    Py_INCREF(parent);
     if (self != NULL) {
         self->pImpl = Label_New(parent->pImpl);
     }
@@ -215,6 +218,7 @@ static PyObject* PyPushButton_new(PyTypeObject* type, PyObject* args, PyObject* 
     if (!PyArg_ParseTuple(args, "O", &parent)) {
         return NULL;
     }
+    Py_INCREF(parent);
     if (self != NULL) {
         self->pImpl = PushButton_New(parent->pImpl);
     }
@@ -243,6 +247,7 @@ static PyObject* PyPushButton_SetOnClicked(PyPushButton* self, PyObject* args) {
     if (!PyCallable_Check(callable)) {
         return NULL;
     }
+    Py_INCREF(callable);
     PyObject* callbackArg = Py_BuildValue("(O)", self);
     PushButton_SetOnClicked(self->pImpl, [callbackArg, callable](Object*) {
         PyObject_CallObject(callable, callbackArg);

@@ -131,6 +131,18 @@ static PyObject* PyWidgets_Object_GetClassName(PyObject* module, PyObject* args)
     if (PyArg_ParseTuple(args, "O", &pyWidget)) {
         return PyWidget_GetClassName(pyWidget);
     }
+    PyVBoxLayout* pyVBoxLayout;
+    if (PyArg_ParseTuple(args, "O", &pyVBoxLayout)) {
+        return PyVBoxLayout_GetClassName(pyVBoxLayout);
+    }
+    PyPushButton* pyPushButton;
+    if (PyArg_ParseTuple(args, "O", &pyPushButton)) {
+        return PyPushButton_GetClassName(pyPushButton);
+    }
+    PyLabel* pyLabel;
+    if (PyArg_ParseTuple(args, "O", &pyLabel)) {
+        return PyLabel_GetClassName(pyLabel);
+    }
     return NULL;
 }
 
