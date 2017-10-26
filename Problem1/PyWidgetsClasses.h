@@ -94,11 +94,11 @@ static PyObject* PyWidget_SetSize(PyWidget* self, PyObject* args) {
 }
 
 static PyObject* PyWidget_Visible(PyWidget* self, PyObject* args) {
-    bool isVisible = 0;
-    if (!PyArg_ParseTuple(args, "p", &isVisible)) {
+    PyObject* isVisible = NULL;
+    if (!PyArg_ParseTuple(args, "O", &isVisible)) {
         return NULL;
     }
-    Widget_SetVisible(self->pImpl, isVisible);
+    Widget_SetVisible(self->pImpl, PyObject_IsTrue(isVisible));
     Py_RETURN_NONE;
 }
 
