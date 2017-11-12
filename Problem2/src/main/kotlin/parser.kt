@@ -8,6 +8,10 @@ class Value(private val value : Double) : Expression {
     override fun eval() = value
 }
 
+class StringExpression(val text : String) : Expression {
+    override fun eval() = throw Exception("Not supported operation StringExpression::eval()")
+}
+
 class Operator(private val left : Expression, private val operation : Char,
                private val right : Expression) : Expression {
 
@@ -26,7 +30,7 @@ class Function(private val function : String,
     override fun eval() : Double = when (function) {
         "ABS" -> Math.abs(arg.eval())
         "SIN" -> Math.sin(arg.eval())
-        "LEN" -> throw Exception("Not Implemented")
+        "LEN" -> (arg as StringExpression).text.length.toDouble()
         else -> throw Exception("Wrong operation type")
     }
 }
@@ -37,6 +41,7 @@ interface Table {
 
 class ExpressionParser(private val table : Table) {
     private val functionTokens = hashSetOf("ABS", "SIN", "LEN")
+    private val numberRegex = Regex("([0-9]+)|([0-9]*\\.[0-9]+)")
 
     fun parse(expr : String) : Double {
         val expressionStack = ArrayList<Expression>()
@@ -48,14 +53,8 @@ class ExpressionParser(private val table : Table) {
                 is OperatorToken -> handleOperatorToken(token, operatorStack, expressionStack)
                 is FunctionToken -> handleStandardOperationToken(token, operatorStack, expressionStack)
                 is NumberToken -> handleNumberToken(token, operatorStack, expressionStack)
-                is CellToken -> {
-                    val otherCellText = table.getCellText(token.rowIndex, token.columnIndex)
-                    if (otherCellText.startsWith('=')) {
-                        expressionStack.add(Value(parse(otherCellText.substring(1))))
-                    } else {
-                        expressionStack.add(Value(otherCellText.toDouble()))
-                    }
-                }
+                is CellToken -> handleCellToken(token, expressionStack)
+                is StringToken -> expressionStack.add(StringExpression(token.text))
             }
         }
 
@@ -130,6 +129,17 @@ class ExpressionParser(private val table : Table) {
             operatorStack.pop()
         }
         expressionStack.add(Value(sign * token.value))
+    }
+
+    private fun handleCellToken(token: CellToken, expressionStack: ArrayList<Expression>) {
+        val otherCellText = table.getCellText(token.rowIndex, token.columnIndex)
+        if (otherCellText.startsWith('=')) {
+            expressionStack.add(Value(parse(otherCellText.substring(1))))
+        } else if (numberRegex.matches(otherCellText)) {
+            expressionStack.add(Value(otherCellText.toDouble()))
+        } else {
+            expressionStack.add(StringExpression(otherCellText))
+        }
     }
 
     private fun getPrecedence(token : Token) : Int = when (token) {
