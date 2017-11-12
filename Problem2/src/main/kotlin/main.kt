@@ -5,9 +5,7 @@ import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.get
 import kotlin.browser.document
 
-
 class Sheet : Table {
-    //val rawTable = Array<Array<String>>(20, { Array('Z' - 'A' + 1, {""}) })
     private val parser = ExpressionParser(this)
 
     override fun getCellText(rowInd : Int, colInd : Char) : String {
