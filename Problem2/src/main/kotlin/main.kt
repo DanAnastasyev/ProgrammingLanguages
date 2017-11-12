@@ -56,7 +56,7 @@ class Sheet : Table {
                         try {
                             cell.innerText = parser.parse(cell.innerText.substring(1)).toString()
                         } catch (ex : Throwable) {
-                            cell.innerText = ex.toString()
+                            cell.innerText = ex.message.orEmpty()
                         }
                     }
                     e.preventDefault()

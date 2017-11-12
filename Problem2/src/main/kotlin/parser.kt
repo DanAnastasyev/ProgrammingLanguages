@@ -62,10 +62,11 @@ class ExpressionParser(private val table : Table) {
             if (operatorStack.last() == openParenthesis || operatorStack.last() == closeParenthesis) {
                 throw Exception("Mismatched parentheses")
             }
-            addOperator(operatorStack, expressionStack)
+            processOperator(operatorStack.pop(), expressionStack)
         }
-        return if (expressionStack.size == 1) {
-            expressionStack.last().eval()
+
+        if (expressionStack.size == 1) {
+             return expressionStack.last().eval()
         } else {
             throw Exception("Parsing error")
         }
@@ -76,15 +77,17 @@ class ExpressionParser(private val table : Table) {
         when (token.operation) {
             '-', '+', '*', '/' -> handleStandardOperationToken(token, operatorStack, expressionStack)
             '—', '(' -> operatorStack.add(token)
-            ')' -> {
-                while (operatorStack.lastOrNull() != openParenthesis) {
-                    addOperator(operatorStack, expressionStack)
-                }
-                operatorStack.safePop()
-                if (operatorStack.last() is FunctionToken) {
-                    addOperator(operatorStack, expressionStack)
-                }
-            }
+            ')' -> handleCloseParenthesis(operatorStack, expressionStack)
+        }
+    }
+
+    private fun handleCloseParenthesis(operatorStack: ArrayList<Token>, expressionStack: ArrayList<Expression>) {
+        while (operatorStack.lastOrNull() != openParenthesis) {
+            processOperator(operatorStack.pop(), expressionStack)
+        }
+        operatorStack.safePop()
+        if (operatorStack.last() is FunctionToken) {
+            processOperator(operatorStack.pop(), expressionStack)
         }
     }
 
@@ -92,25 +95,27 @@ class ExpressionParser(private val table : Table) {
                                              expressionStack : ArrayList<Expression>) {
         while (operatorStack.isNotEmpty()
                 && getPrecedence(operatorStack.last()) >= getPrecedence(token)) {
-            addOperator(operatorStack, expressionStack)
+            processOperator(operatorStack.pop(), expressionStack)
         }
         operatorStack.add(token)
     }
 
-    private fun addOperator(operatorStack : ArrayList<Token>, expressionStack : ArrayList<Expression>) {
-        val operator = operatorStack.pop()
+    private fun processOperator(operator : Token, expressionStack : ArrayList<Expression>) {
         when (operator) {
-            is FunctionToken -> {
+            is FunctionToken -> addFunctionExpression(operator, expressionStack)
+            is OperatorToken -> addOperatorExpression(operator, expressionStack)
+        }
+    }
+
+    private fun addOperatorExpression(operator : OperatorToken, expressionStack : ArrayList<Expression>) {
+        when (operator) {
+            unaryMinus -> {
                 if (expressionStack.size < 1) {
-                    throw Exception("Wrong number of arguments")
+                    throw Exception("Cannot find argument for unary minus")
                 }
-                expressionStack.add(Function(operator.text, expressionStack.pop()))
+                expressionStack.add(Operator(Value(-1.0), '*', expressionStack.pop()))
             }
-            is OperatorToken -> {
-                if (operator == unaryMinus) {
-                    expressionStack.add(Operator(Value(-1.0), '*', expressionStack.pop()))
-                    return
-                }
+            else -> {
                 if (expressionStack.size < 2) {
                     throw Exception("Wrong number of arguments")
                 }
@@ -119,6 +124,13 @@ class ExpressionParser(private val table : Table) {
                 expressionStack.add(Operator(left, operator.operation, right))
             }
         }
+    }
+
+    private fun addFunctionExpression(operator : FunctionToken, expressionStack : ArrayList<Expression>) {
+        if (expressionStack.size < 1) {
+            throw Exception("Wrong number of arguments")
+        }
+        expressionStack.add(Function(operator.text, expressionStack.pop()))
     }
 
     private fun handleNumberToken(token : NumberToken, operatorStack : ArrayList<Token>,

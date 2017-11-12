@@ -45,16 +45,8 @@ class ExpressionTokenizer(private val line : String, private val specialTokens :
                 token += line[pos];
                 continue
             }
-            val tokenType = when {
-                line[pos].isDigit() || line[pos] == '.' -> SymbolType.DIGIT
-                line[pos] in operators -> SymbolType.OPERATOR
-                line[pos].isLetter() -> SymbolType.LETTER
-                line[pos].isWhitespace() -> SymbolType.WHITESPACE
-                line[pos] == '"' -> SymbolType.QUOTE
-                else -> SymbolType.UNDEFINED
-            }
-            when (tokenType) {
-                SymbolType.OPERATOR -> {
+            when {
+                line[pos] in operators -> {
                     handleLongToken(token)
                     if (line[pos] == '-' && isUnaryMinusPossible) {
                         yield(OperatorToken('—'))
@@ -64,15 +56,15 @@ class ExpressionTokenizer(private val line : String, private val specialTokens :
                     token = ""
                     isUnaryMinusPossible = line[pos] != ')'
                 }
-                SymbolType.WHITESPACE -> {
+                line[pos].isWhitespace() -> {
                     handleLongToken(token)
                     token = ""
                 }
-                SymbolType.LETTER, SymbolType.DIGIT -> {
+                isLongTokenSymbol(line[pos]) -> {
                     token += line[pos]
                     isUnaryMinusPossible = false
                 }
-                SymbolType.QUOTE -> {
+                line[pos] == '"' -> {
                     if (isInsideString) {
                         yield(StringToken(token))
                         token = ""
@@ -81,7 +73,7 @@ class ExpressionTokenizer(private val line : String, private val specialTokens :
                     }
                     isInsideString = !isInsideString
                 }
-                SymbolType.UNDEFINED -> throw Exception("Unknown token: " + line[pos])
+                else -> throw Exception("Unknown token: " + line[pos])
             }
         }
         handleLongToken(token)
@@ -98,4 +90,6 @@ class ExpressionTokenizer(private val line : String, private val specialTokens :
             else -> throw Exception("Wrong token: " + token)
         })
     }
+
+    private fun isLongTokenSymbol(symb : Char) = symb.isDigit() || symb == '.' || symb.isLetter()
 }
