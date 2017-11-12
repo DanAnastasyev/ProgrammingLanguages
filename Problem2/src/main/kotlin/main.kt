@@ -1,9 +1,14 @@
+package ru.mipt.proglangs
+
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLTableElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.get
 import kotlin.browser.document
+import kotlin.browser.window
+
+import ru.mipt.proglangs.sheets.parser.*
 
 class Sheet : Table {
     private val parser = ExpressionParser(this)
@@ -54,7 +59,12 @@ class Sheet : Table {
                 if (e.keyCode == 13) {
                     if (cell.innerText.startsWith('=')) {
                         try {
-                            cell.innerText = parser.parse(cell.innerText.substring(1)).toString()
+                            val expression = parser.parse(cell.innerText.substring(1))
+                            if (expression is StringExpression) {
+                                cell.innerText = expression.text
+                            } else {
+                                cell.innerText = expression.eval().toString()
+                            }
                         } catch (ex : Throwable) {
                             cell.innerText = ex.message.orEmpty()
                         }
@@ -62,9 +72,13 @@ class Sheet : Table {
                     e.preventDefault()
                 }
             })
+            cell.addEventListener("keyup", { window.localStorage.setItem(cell.id, cell.innerText) })
         }
         cell.style.width = "100px"
         cell.id = "${rowInd}_$colInd"
+        if (rowInd != 0) {
+            cell.innerText = window.localStorage.getItem(cell.id).orEmpty()
+        }
         return cell
     }
 }

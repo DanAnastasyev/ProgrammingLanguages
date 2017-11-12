@@ -1,3 +1,5 @@
+package ru.mipt.proglangs.sheets.parser
+
 import kotlin.js.Math
 
 interface Expression {
@@ -9,7 +11,7 @@ class Value(private val value : Double) : Expression {
 }
 
 class StringExpression(val text : String) : Expression {
-    override fun eval() = throw Exception("Not supported operation StringExpression::eval()")
+    override fun eval() = throw Exception("Cannot use string \"$text\" in arithmetic expressions")
 }
 
 class Operator(private val left : Expression, private val operation : Char,
@@ -43,7 +45,7 @@ class ExpressionParser(private val table : Table) {
     private val functionTokens = hashSetOf("ABS", "SIN", "LEN")
     private val numberRegex = Regex("([0-9]+)|([0-9]*\\.[0-9]+)")
 
-    fun parse(expr : String) : Double {
+    fun parse(expr : String) : Expression {
         val expressionStack = ArrayList<Expression>()
         val operatorStack = ArrayList<Token>()
 
@@ -66,7 +68,7 @@ class ExpressionParser(private val table : Table) {
         }
 
         if (expressionStack.size == 1) {
-             return expressionStack.last().eval()
+            return expressionStack.last()
         } else {
             throw Exception("Parsing error")
         }
@@ -146,7 +148,7 @@ class ExpressionParser(private val table : Table) {
     private fun handleCellToken(token: CellToken, expressionStack: ArrayList<Expression>) {
         val otherCellText = table.getCellText(token.rowIndex, token.columnIndex)
         if (otherCellText.startsWith('=')) {
-            expressionStack.add(Value(parse(otherCellText.substring(1))))
+            expressionStack.add(parse(otherCellText.substring(1)))
         } else if (numberRegex.matches(otherCellText)) {
             expressionStack.add(Value(otherCellText.toDouble()))
         } else {
