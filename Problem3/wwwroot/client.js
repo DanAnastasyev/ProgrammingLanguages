@@ -35,10 +35,31 @@ connection.on("setBoardSize", (newBoardSize) => {
     boardSize = newBoardSize;
 
     drawBoard();
+
     var boardX = board.getBoundingClientRect().left;
     var boardY = board.getBoundingClientRect().top;
     board.addEventListener("click", event => {
         connection.invoke("click", event.pageX - boardX, event.pageY - boardY);
+    });
+
+    var leftButton = document.getElementById("leftButton");
+    leftButton.addEventListener("click", () => {
+        connection.invoke("MoveLeft");
+    });
+
+    var rightButton = document.getElementById("rightButton");
+    rightButton.addEventListener("click", () => {
+        connection.invoke("MoveRight");
+    });
+
+    var downButton = document.getElementById("downButton");
+    downButton.addEventListener("click", () => {
+        connection.invoke("MoveDown");
+    });
+
+    var upButton = document.getElementById("upButton");
+    upButton.addEventListener("click", () => {
+        connection.invoke("MoveUp");
     });
 });
 
@@ -64,6 +85,13 @@ connection.on("drawZero", (i, j) => {
     context.arc((i + 0.5) * cellSize, (j + 0.5) * cellSize,
         (cellSize - offset) / 2, 0, 2 * Math.PI);
     context.stroke();
+});
+
+connection.on("clear", () => {
+    var board = document.getElementById("board");
+    var context = board.getContext("2d");
+    context.clearRect(0, 0, board.width, board.height);
+    drawBoard();
 });
 
 connection.start();
