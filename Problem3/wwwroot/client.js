@@ -20,7 +20,29 @@ function drawBoard() {
     context.stroke();
 }
 
-function drawX(i, j) {
+connection.on("broadcastMessage", (message) => {
+    alert(message);
+});
+
+connection.on("setBoardSize", (newBoardSize) => {
+    var board = document.getElementById("board");
+    board.width = newBoardSize;
+    board.height = newBoardSize;
+
+    var padding = 20;
+    document.body.style.backgroundSize =
+        `${newBoardSize + padding}px ${newBoardSize + padding}px`;
+    boardSize = newBoardSize;
+
+    drawBoard();
+    var boardX = board.getBoundingClientRect().left;
+    var boardY = board.getBoundingClientRect().top;
+    board.addEventListener("click", event => {
+        connection.invoke("click", event.pageX - boardX, event.pageY - boardY);
+    });
+});
+
+connection.on("drawX", (i, j) => {
     var offset = 15;
     var context = document.getElementById("board").getContext("2d");
     context.strokeStyle = "rgba(244, 66, 66, 0.8)";
@@ -31,9 +53,9 @@ function drawX(i, j) {
     context.moveTo(i * cellSize + offset, (j + 1) * cellSize - offset);
     context.lineTo((i + 1) * cellSize - offset, j * cellSize + offset);
     context.stroke();
-}
+});
 
-function drawZero(i, j) {
+connection.on("drawZero", (i, j) => {
     var offset = 25;
     var context = document.getElementById("board").getContext("2d");
     context.strokeStyle = "rgba(65, 178, 244, 0.8)";
@@ -42,23 +64,6 @@ function drawZero(i, j) {
     context.arc((i + 0.5) * cellSize, (j + 0.5) * cellSize,
         (cellSize - offset) / 2, 0, 2 * Math.PI);
     context.stroke();
-}
-
-window.onload = function() {
-    drawBoard();
-    drawX(1, 1);
-    drawZero(2, 1);
-    var board = document.getElementById("board");
-    var boardX = board.getBoundingClientRect().left;
-    var boardY = board.getBoundingClientRect().top;
-    board.addEventListener("click",
-        event => {
-            connection.invoke("click", event.pageX - boardX, event.pageY - boardY);
-        });
-};
-
-connection.on("broadcastMessage", (message) => {
-    alert(message);
 });
 
 connection.start();
