@@ -88,17 +88,28 @@ namespace Problem3 {
         }
 
         private void UpdateCell(int i, int j, string playerId, IGameHandler handler) {
-            if (_isFirstPlayerTurn && _players[0].PlayerId == playerId) {
+            if (_isFirstPlayerTurn && _players[0].PlayerId == playerId
+                    && CheckMovePermissibility(i, j, handler)) {
                 _cells[i, j] = CellType.Zero;
                 handler.DrawZero(i - _players[0].ViewportLeft, j - _players[0].ViewportTop);
                 _isFirstPlayerTurn = false;
-            } else if (!_isFirstPlayerTurn && _players[1].PlayerId == playerId) {
+            } else if (!_isFirstPlayerTurn && _players[1].PlayerId == playerId
+                    && CheckMovePermissibility(i, j, handler)) {
                 _cells[i, j] = CellType.X;
                 handler.DrawX(i - _players[0].ViewportLeft, j - _players[0].ViewportTop);
                 _isFirstPlayerTurn = true;
             } else {
                 handler.BroadcastMessage(true, "Please, wait... it's not your turn");
             }
+        }
+
+        private bool CheckMovePermissibility(int i, int j, IGameHandler handler)
+        {
+            if (!_cells.IsCellEmpty(i, j)) {
+                handler.BroadcastMessage(true, "You can't draw in non-empty cell");
+                return false;
+            }
+            return true;
         }
 
         private bool IsWinMove(int i, int j) {
